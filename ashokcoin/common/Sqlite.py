@@ -41,19 +41,21 @@ class SQLITE:
 				['ian', 1337],
 				['ashok', 3],
 				['trump', 1000000000]]
+		uid = 1
 		for user in users:
 			statement = (
 					"INSERT INTO users "
-					f"VALUES ('{user}')"
+					f"VALUES ('{uid}', '{user}')"
 			)
 			print(statement)
 			self.update(statement)
+			uid += 1
 		for wallet in wallets:
 			statement = (
 					"INSERT INTO wallets "
 					f"VALUES ({wallet[1]}, "
 					"(SELECT user_id FROM users "
-					f"WHERE username = {wallet[0]}")
+					f"WHERE username = '{wallet[0]}'))")
 			print(statement)
 			self.update(statement)
 

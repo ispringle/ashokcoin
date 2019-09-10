@@ -18,8 +18,8 @@ RUN apt-get install -y \
 	git
 
 RUN git clone https://github.com/pard68/ashokcoin.git .
-
-RUN pip3 install -r ./requirements.txt
+RUN git checkout devel
+RUN pip3 install -r requirements.txt
 
 ENTRYPOINT ["python3"]
-CMD ["app.py"]
+CMD ["./ashokcoin/main.py"]
