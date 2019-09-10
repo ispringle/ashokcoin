@@ -2,7 +2,8 @@ import sqlite3
 
 class SQLITE:
 	def __init__(self):
-		self.conn = sqlite3.connect('ashokcoin.db')
+		self.conn = sqlite3.connect('ashokcoin.db',
+									check_same_thread = False)
 		self.cur = self.conn.cursor()
 		self.create_if_not_exist()
 		self.insert_test_data()
@@ -14,20 +15,21 @@ class SQLITE:
 		called, so this is safe to run even if the
 		database has been setup properly already.
 		"""
+
 		users_statement = (
 				"CREATE TABLE IF NOT EXISTS users "
 				"(user_id INTEGER PRIMARY KEY, "
-				"username text NOT NULL)")
+				"username text UNIQUE)")
 		wallets_statement = (
 				"CREATE TABLE IF NOT EXISTS wallets "
-				"(wallet_id NOT NULL PRIMARY KEY, "
-				"total REAL, user_id, "
+				"(wallet_id INTEGER PRIMARY KEY, "
+				"total REAL, user_id UNIQUE, "
 				"FOREIGN KEY(user_id) REFERENCES users(user_id))")
 		ledgers_statement = (
 				"CREATE TABLE IF NOT EXISTS ledgers "
-				"(ledger_id NOT NULL PRIMARY KEY, "
-				"date INTEGER, payer INTEGER, "
-				"payee INTEGER, amount REAL, "
+				"(ledger_id INTEGER PRIMARY KEY, "
+				"date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, "
+				"payer INTEGER, payee INTEGER, amount REAL, "
 				"FOREIGN KEY(payer) REFERENCES users(user_id), "
 				"FOREIGN KEY(payee) REFERENCES users(user_id))")
 		self.cur.execute(users_statement)
@@ -44,15 +46,16 @@ class SQLITE:
 		uid = 1
 		for user in users:
 			statement = (
-					"INSERT INTO users "
-					f"VALUES ('{uid}', '{user}')"
+					"INSERT OR IGNORE INTO users (username) "
+					f"VALUES ('{user}')"
 			)
 			print(statement)
 			self.update(statement)
 			uid += 1
 		for wallet in wallets:
 			statement = (
-					"INSERT INTO wallets "
+					"INSERT OR IGNORE INTO wallets "
+					"(total, user_id) "
 					f"VALUES ({wallet[1]}, "
 					"(SELECT user_id FROM users "
 					f"WHERE username = '{wallet[0]}'))")

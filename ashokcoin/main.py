@@ -13,19 +13,11 @@ api = Api(app)
 
 db = SQLITE()
 
-def abort_if_user_doesnt_exist(user):
-	check_users = (
-			"SELECT username FROM users"
-	)
-	if user not in db.run(check_users):
-		message = f"User {user} doesn't exist!"
-		abort(404, message=message)
 
-
-api.add_resource(Ashokcoin, '/ashokcoin/transact')
-api.add_resource(Ledger, '/ashokcoin/ledger')
-api.add_resource(User, '/ashokcoin/user/<user>')
-api.add_resource(Wallet, '/ashokcoin/wallet/<user>')
+api.add_resource(Ashokcoin, '/ashokcoin/transact/<sender>/<recipient>/<amount>', resource_class_args={db})
+api.add_resource(Ledger, '/ashokcoin/ledger', resource_class_args={db})
+api.add_resource(User, '/ashokcoin/user/<user>', resource_class_args={db})
+api.add_resource(Wallet, '/ashokcoin/wallet/<user>', resource_class_args={db})
 
 
 if __name__  == "__main__":
